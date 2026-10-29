@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 import { getContactHref, site, type SiteImage } from "@/config/site";
 
-gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 function Ornament({ opening = false }: { opening?: boolean }) {
   return (
@@ -112,36 +111,27 @@ export default function App() {
   }, [menuOpen]);
 
   useGSAP(() => {
-    const root = scope.current;
-    if (!root) return;
     const media = gsap.matchMedia();
     let disposed = false;
-    const activeSplits = new Set<SplitText>();
-
-    try {
+    const initialize = () => {
+      if (disposed || !scope.current) return;
       media.add("(prefers-reduced-motion: no-preference)", () => {
-        const splits: SplitText[] = [];
+        const root = scope.current!;
         root.querySelectorAll<HTMLElement>("[data-title]").forEach((heading) => {
-          const split = SplitText.create(heading, { type: "words", aria: "auto" });
-          splits.push(split);
-          activeSplits.add(split);
-          gsap.fromTo(split.words, { y: 24, opacity: 0 }, {
-            y: 0, opacity: 1, duration: .9, stagger: .07,
-            ease: "power3.out", immediateRender: false,
+          gsap.from(heading, {
+            y: 32, opacity: 0, duration: 1, ease: "power3.out",
             scrollTrigger: { trigger: heading, start: "top 88%", once: true },
           });
         });
         root.querySelectorAll<HTMLElement>("[data-reveal]").forEach((element) => {
-          gsap.fromTo(element, { y: 24, opacity: 0 }, {
-            y: 0, opacity: 1, duration: .85, ease: "power2.out",
-            immediateRender: false,
+          gsap.from(element, {
+            y: 24, opacity: 0, duration: .85, ease: "power2.out",
             scrollTrigger: { trigger: element, start: "top 90%", once: true },
           });
         });
         root.querySelectorAll<HTMLElement>("[data-photo]").forEach((element) => {
-          gsap.fromTo(element, { scale: .96, y: 24, opacity: .2 }, {
-            scale: 1, y: 0, opacity: 1, duration: 1.2,
-            ease: "power2.out", immediateRender: false,
+          gsap.from(element, {
+            clipPath: "inset(12% 8% 12% 8%)", opacity: .2, duration: 1.2,
             scrollTrigger: { trigger: element, start: "top 85%", once: true },
           });
         });
@@ -158,52 +148,29 @@ export default function App() {
             .from(opening.querySelector(".card-right"), { rotation: 0, x: -28, transformOrigin: "50% 90%", duration: 1 }, 0)
             .from(opening.querySelector(".shells"), { y: -25, opacity: 0, duration: .7 }, .2);
         }
-        gsap.from(root.querySelector(".timeline-thread"), {
+        gsap.from(".timeline-thread", {
           scaleY: 0, transformOrigin: "top center", ease: "none",
-          scrollTrigger: { trigger: root.querySelector(".timeline"), start: "top 75%", end: "bottom 65%", scrub: .7 },
+          scrollTrigger: { trigger: ".timeline", start: "top 75%", end: "bottom 65%", scrub: .7 },
         });
-        gsap.from(root.querySelector(".hero-glow"), { opacity: 0, scale: .7, duration: 2, ease: "power2.out" });
+        gsap.from(".hero-glow", { opacity: 0, scale: .7, duration: 2, ease: "power2.out" });
         const desktop = gsap.matchMedia();
-        desktop.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+        desktop.add("(min-width: 1024px)", () => {
           ScrollTrigger.create({
-            trigger: root.querySelector("#trajetoria"), start: "top 130px", end: "bottom 75%",
-            pin: root.querySelector<HTMLElement>(".trajectory-heading")!, pinSpacing: false,
+            trigger: "#trajetoria", start: "top 130px", end: "bottom 75%",
+            pin: ".trajectory-heading", pinSpacing: false,
           });
           gsap.timeline({
-            scrollTrigger: { trigger: root.querySelector(".knowledge-scene"), start: "top top", end: "+=45%", pin: true, scrub: .8 },
-          }).fromTo(root.querySelector(".knowledge-halo"), { scale: .7, opacity: .15 }, { scale: 1.1, opacity: .45, ease: "none" });
-        }, root);
+            scrollTrigger: { trigger: ".knowledge-scene", start: "top top", end: "+=45%", pin: true, scrub: .8 },
+          }).fromTo(".knowledge-halo", { scale: .7, opacity: .15 }, { scale: 1.1, opacity: .45, ease: "none" });
+        });
+        ScrollTrigger.refresh();
         return () => {
           desktop.revert();
-          splits.forEach((split) => {
-            split.revert();
-            activeSplits.delete(split);
-          });
         };
-      }, root);
-      ScrollTrigger.refresh();
-    } catch (error) {
-      media.revert();
-      activeSplits.forEach((split) => split.revert());
-      activeSplits.clear();
-      console.warn("Animações desativadas; o conteúdo da página foi preservado.", error);
-    }
-
-    // As fontes apenas atualizam as medidas; não bloqueiam a página.
-    const refresh = () => {
-      if (!disposed) ScrollTrigger.refresh();
+      }, scope);
     };
-    void document.fonts?.ready.then(refresh).catch(() => {});
-    root.addEventListener("load", refresh, true);
-    root.addEventListener("toggle", refresh, true);
-    return () => {
-      disposed = true;
-      root.removeEventListener("load", refresh, true);
-      root.removeEventListener("toggle", refresh, true);
-      media.revert();
-      activeSplits.forEach((split) => split.revert());
-      activeSplits.clear();
-    };
+    void document.fonts.ready.then(initialize);
+    return () => { disposed = true; media.revert(); };
   }, { scope });
 
   function closeMenuToSection(href: string) {

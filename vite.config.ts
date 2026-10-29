@@ -4,14 +4,6 @@ import { fileURLToPath, URL } from "node:url";
 
 export default defineConfig({
   plugins: [react()],
-  server: {
-    host: "0.0.0.0",
-    port: 8080,
-  },
-  preview: {
-    host: "0.0.0.0",
-    port: 8080,
-  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
