@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 import { getContactHref, site, type SiteImage } from "@/config/site";
 
-gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 function Ornament({ opening = false }: { opening?: boolean }) {
   return (
@@ -118,12 +117,9 @@ export default function App() {
       if (disposed || !scope.current) return;
       media.add("(prefers-reduced-motion: no-preference)", () => {
         const root = scope.current!;
-        const splits: SplitText[] = [];
         root.querySelectorAll<HTMLElement>("[data-title]").forEach((heading) => {
-          const split = SplitText.create(heading, { type: "words", aria: "auto" });
-          splits.push(split);
-          gsap.from(split.words, {
-            yPercent: 60, opacity: 0, duration: 1, stagger: .045, ease: "power3.out",
+          gsap.from(heading, {
+            y: 32, opacity: 0, duration: 1, ease: "power3.out",
             scrollTrigger: { trigger: heading, start: "top 88%", once: true },
           });
         });
@@ -170,7 +166,6 @@ export default function App() {
         ScrollTrigger.refresh();
         return () => {
           desktop.revert();
-          splits.forEach((split) => split.revert());
         };
       }, scope);
     };
