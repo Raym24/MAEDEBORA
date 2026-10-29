@@ -1,29 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --border: 214 32% 91%;
-    --radius: 0.75rem;
+    color-scheme: light;
+    --background: 39 45% 93%;
+    --foreground: 340 29% 16%;
+    --card: 37 37% 88%;
+    --card-foreground: 340 29% 16%;
+    --primary: 344 49% 23%;
+    --primary-foreground: 39 45% 93%;
+    --muted: 37 37% 88%;
+    --muted-foreground: 337 12% 35%;
+    --border: 34 24% 72%;
+    --radius: 0.25rem;
   }
 
-  * {
-    @apply border-border;
-  }
-
+  * { @apply border-border; }
+  html { scroll-padding-top: 6.5rem; }
   body {
-    @apply bg-background text-foreground;
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-      "Helvetica Neue", Arial, sans-serif;
+    @apply m-0 bg-background text-foreground;
+    min-width: 320px;
+    font-family: 'Manrope', sans-serif;
     -webkit-font-smoothing: antialiased;
   }
+  h1, h2, h3 { text-wrap: balance; }
+  p { overflow-wrap: anywhere; }
+  section[id], main[id] { scroll-margin-top: 6.5rem; }
+  img, svg { max-width: 100%; }
+  a, button, summary { -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 2px solid currentColor; outline-offset: 6px; }
+  ::selection { background: #c7a477; color: #261018; }
+}
+
+@layer components {
+  .page-width { @apply mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16; }
+  .section-space { @apply py-20 sm:py-28 lg:py-36; }
+  .eyebrow { @apply text-[10px] font-semibold uppercase leading-6 tracking-[0.2em] sm:text-xs; }
+  .editorial-title {
+    font-family: 'Bodoni Moda', Georgia, serif;
+    font-size: clamp(2.5rem, 5.4vw, 5rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -.045em;
+  }
+  .hero-title {
+    font-family: 'Bodoni Moda', Georgia, serif;
+    font-size: clamp(3.1rem, 7.7vw, 7rem);
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: -.05em;
+  }
+  .font-serif { font-family: 'Bodoni Moda', Georgia, serif; }
+  .body-copy { @apply max-w-xl text-base leading-8 text-muted-foreground; }
+  .editorial-button {
+    @apply inline-flex min-h-14 max-w-full items-center justify-between gap-7 border border-[#c7a477] px-6 py-4 text-left text-xs font-semibold leading-5 sm:px-8;
+    background: #c7a477;
+    color: #261018;
+  }
+  .editorial-button:hover { background: #dec5a4; }
+  .button-dark { @apply border-primary bg-primary text-primary-foreground; }
+  .button-dark:hover { background: #571d2c; }
+  .nav-link { @apply inline-flex min-h-11 items-center; }
+  .nav-link:hover { text-decoration: underline; text-underline-offset: 7px; }
+  .skip-link {
+    @apply fixed left-4 top-4 z-[100] -translate-y-32 bg-background px-6 py-4 text-sm font-semibold text-foreground;
+  }
+  .skip-link:focus { transform: translateY(0); }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item[open] .faq-icon { transform: rotate(45deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
